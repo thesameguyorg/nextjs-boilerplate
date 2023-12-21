@@ -1,8 +1,37 @@
 import Image from 'next/image'
+import { fetchProfiles } from 'app/api.ts';
+
+import { useState, useEffect } from 'react';
 
 export default function Home() {
+  const [profiles, setProfiles] = useState(null);
+  const [error, setError] = useState('');
+
+  useEffect(() => {
+    fetchProfiles()
+      .then(data => setProfiles(data))
+      .catch(error => setError(error.message));
+  }, []);
   return (
     <main className="flex min-h-screen flex-col items-center justify-between p-24">
+      {error && <p className="text-red-600">Error: {error}</p>}
+      {!error && profiles && (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          {profiles.map((profile) => (
+            <div key={profile.id} className="max-w-sm rounded overflow-hidden shadow-lg m-4">
+              {/* You can style your profile cards here */}
+              <img className="w-full" src={profile.image} alt={profile.name} />
+              <div className="px-6 py-4">
+                <div className="font-bold text-xl mb-2">{profile.name}</div>
+                <p className="text-gray-700 text-base">
+                  {profile.description}
+                </p>
+                {/* More profile data here */}
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
       <div className="z-10 max-w-5xl w-full items-center justify-between font-mono text-sm lg:flex">
         <p className="fixed left-0 top-0 flex w-full justify-center border-b border-gray-300 bg-gradient-to-b from-zinc-200 pb-6 pt-8 backdrop-blur-2xl dark:border-neutral-800 dark:bg-zinc-800/30 dark:from-inherit lg:static lg:w-auto  lg:rounded-xl lg:border lg:bg-gray-200 lg:p-4 lg:dark:bg-zinc-800/30">
           Get started by editing&nbsp;
